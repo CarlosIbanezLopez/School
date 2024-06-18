@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:school/src/game/game_screen.dart';
 import 'package:school/src/pages/calendar/calendar_page.dart';
+import 'package:school/src/pages/grade/data_screen.dart';
+import 'package:school/src/pages/grade/student_details.dart';
 import 'package:school/src/pages/login/login_controller.dart';
 import 'package:school/src/quiz/home_screen.dart';
 import '../../components/main_button.dart';
@@ -21,8 +23,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  LoginController _loginController = LoginController();
+  String? userType; // Variable para almacenar el tipo de usuario seleccionado
+
   @override
   void initState() {
 
@@ -32,8 +34,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void _initializeControllers() {
     _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-    _loginController = LoginController();
   }
 
   @override
@@ -86,49 +86,60 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           fillColor: ThemeColors.textFieldBgColor,
                           filled: true,
-                          hintText: "E-mail",
+                          hintText: "Carnet de identidad",
                           hintStyle: GoogleFonts.poppins(
                             color: ThemeColors.textFieldHintColor,
                             fontSize: FontSize.medium,
                             fontWeight: FontWeight.w400,
                           ),
-                          border: OutlineInputBorder(
+                          border: const OutlineInputBorder(
                             borderSide: BorderSide.none,
                             borderRadius: BorderRadius.all(Radius.circular(18)),
                           ),
                         ),
                       ),
-                      SizedBox(height: 16),
-
-                      ///Password Input Field
-                      TextFormField(
-                        controller: _passwordController,
-                        validator: (value) {
-                          if (_passwordController.text.isEmpty) {
-                            return "This field can't be empty";
-                          }
+                      const SizedBox(height: 20),
+                      PopupMenuButton<String>(
+                        onSelected: (String value) {
+                          setState(() {
+                            userType = value;
+                          });
                         },
-                        obscureText: true,
-                        style: GoogleFonts.poppins(
-                          color: ThemeColors.whiteTextColor,
-                        ),
-                        keyboardType: TextInputType.visiblePassword,
-                        cursorColor: ThemeColors.primaryColor,
-                        decoration: InputDecoration(
-                          fillColor: ThemeColors.textFieldBgColor,
-                          filled: true,
-                          hintText: "Password",
-                          hintStyle: GoogleFonts.poppins(
-                            color: ThemeColors.textFieldHintColor,
-                            fontSize: FontSize.medium,
-                            fontWeight: FontWeight.w400,
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'Estudiante',
+                            child: Text('Estudiante'),
                           ),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.all(Radius.circular(18)),
+                          const PopupMenuItem<String>(
+                            value: 'Apoderado',
+                            child: Text('Apoderado'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'Profesor',
+                            child: Text('Profesor'),
+                          ),
+                        ],
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: ThemeColors.primaryColor, // Cambiar el color de fondo del botón
+                            borderRadius: BorderRadius.circular(8.0), // Cambiar la forma del botón
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Selecciona tu tipo',
+                                style: TextStyle(color: Colors.white), // Cambiar el color del texto del botón
+                              ),
+                              Icon(Icons.arrow_drop_down, color: Colors.white), // Cambiar el color del icono
+                            ],
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 16),
+
                       Align(
                         alignment: Alignment.centerRight,
                         child: Padding(
@@ -146,34 +157,38 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 70),
                       MainButton(
-                        onTap: () => Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => HomeScreen(),
-                            )
-                        ),
-                        // onTap: () async {_formKey.currentState!.validate();
-                        // // Verifica el inicio de sesión
-                        // final result = await _loginController.login(_emailController.text, _passwordController.text);
-                        //
-                        // if (result['success']) {
-                        //   // Inicio de sesión exitoso, puedes redirigir al usuario a la pantalla de inicio.
-                        //   Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));
-                        // } else {
-                        //   // Error de inicio de sesión, muestra un mensaje de error.
-                        //   final message = result['message'];
-                        //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-                        // }},
+                        onTap: () {
+                          if (userType == 'Estudiante') {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                // builder: (context) => DataScreen(ci: _emailController.text), // Pasa el CI aquí
+                                builder: (context) => HomeScreen(ci: _emailController.text),
+                              ),
+                            );
+                          } else if (userType == 'Apoderado') {
+                            // Navegar a la pantalla de apoderado
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => StudentDetails(ci: _emailController.text), // Pasa el CI aquí
+                              ),
+                            );
+                          } else if (userType == 'Profesor') {
+
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => CalendarPage(UserRole.admin), // Pasa el CI aquí
+                              ),
+                            );
+                          } else {
+                            // Si no se ha seleccionado un tipo de usuario
+                            // mostrar un mensaje o hacer algo
+                          }
+                        },
                         text: 'Login',
                       ),
-                      // SizedBox(height: 16),
-                      // MainButton(
-                      //   text: 'Login with Google',
-                      //   backgroundColor: ThemeColors.whiteTextColor,
-                      //   textColor: ThemeColors.scaffoldBbColor,
-                      //   iconPath: 'images/google.png',
-                      //   onTap: () {},
-                      // ),
                     ],
                   ),
                 ),

@@ -2,15 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class LoginController {
-  static const apiUrl = 'https://a04b-181-188-162-155.ngrok-free.app/api/users'; // Reemplaza con la URL de tu punto de inicio de sesión
+  static const apiUrl = 'http://192.168.0.4:3000/datas?'; // Reemplaza con la URL de tu punto de inicio de sesión
 
-  Future<Map<String, dynamic>> login(String username, String password) async {
+  Future<Map<String, dynamic>> login(String ci) async {
     final Map<String, String> bodyData = {
-      'username': username,
-      'password': password,
+      'username': ci,
     };
-    print(username);
-    print(password);
+    print(ci);
 
     try {
 

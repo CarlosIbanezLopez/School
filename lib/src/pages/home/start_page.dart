@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:school/src/pages/grade/data_screen.dart';
+import 'package:school/src/pages/grade/studen_grade_page.dart';
 import '../../components/main_button.dart';
 import '../../helpers/font_size.dart';
 import '../../helpers/theme_colors.dart';
